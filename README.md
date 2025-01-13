@@ -79,3 +79,11 @@ Proje ile ilgili sorularınız veya önerileriniz varsa, bana ulaşabilirsiniz:
 ## 🌍 Teşekkürler
 
 Bu projeyi kullandığınız için teşekkür ederim! Eğer beğendiyseniz, star ⭐ vererek destek olabilirsiniz.
+
+---
+
+## 🔗 GreasyFork Bağlantısı
+
+[![GreasyFork](https://img.shields.io/badge/GreasyFork-Link-blue?style=for-the-badge&logo=javascript)](https://greasyfork.org/tr/scripts/523641)
+
+---
