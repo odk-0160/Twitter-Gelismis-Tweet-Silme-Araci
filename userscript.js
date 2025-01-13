@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Twitter Tweet Silme Paneli (Gelişmiş Özellikler)
 // @namespace    http://tampermonkey.net/
-// @version      1.0
-// @description  Twitter'da belirli bir kullanıcı adı ve kelimeye göre tweet'leri siler, gelişmiş filtreleme, otomatik kaydırma, işlem geçmişi, çoklu dil desteği ve hata yönetimi içerir.
+// @version      3.2
+// @description  Twitter'da belirli bir kullanıcı adı ve kelimeye göre tweet'leri siler, gelişmiş filtreleme, otomatik kaydırma, işlem geçmişi ve hata yönetimi içerir.
 // @author       odk-0160
 // @match        *://twitter.com/*
 // @match        *://x.com/*
@@ -14,59 +14,24 @@
 (function () {
     'use strict';
 
-    // Dil desteği (6)
-    const language = navigator.language.startsWith('tr') ? 'tr' : 'en';
-    const translations = {
-        tr: {
-            search: "Arama Yap",
-            delete: "Tweetleri Sil",
-            stop: "İşlemi Durdur",
-            excludePlaceholder: "Hariç Tutulacak Tweet ID'leri (Nokta ile ayırın)",
-            addExclude: "ID'leri Ekle",
-            noTweets: "Silinecek tweet bulunamadı.",
-            scrollMore: "Sayfa kaydırılıyor...",
-            processStopped: "İşlem kullanıcı tarafından durduruldu.",
-            processCompleted: "İşlem tamamlandı.",
-            history: "İşlem Geçmişi",
-            clearHistory: "Geçmişi Temizle",
-            error: "Hata",
-            errorOccurred: "Bir hata oluştu:"
-        },
-        en: {
-            search: "Search",
-            delete: "Delete Tweets",
-            stop: "Stop Process",
-            excludePlaceholder: "Exclude Tweet IDs (Separate with dots)",
-            addExclude: "Add IDs",
-            noTweets: "No tweets found to delete.",
-            scrollMore: "Scrolling page...",
-            processStopped: "Process stopped by user.",
-            processCompleted: "Process completed.",
-            history: "Process History",
-            clearHistory: "Clear History",
-            error: "Error",
-            errorOccurred: "An error occurred:"
-        }
-    };
-
-    // Panel HTML'i (9 - Kullanıcı Dostu Arayüz)
+    // Panel HTML'i (Kullanıcı Dostu Arayüz)
     const panelHTML = `
         <div id="tweetDeletePanel" style="position: fixed; top: 10px; right: 10px; background: #1DA1F2; padding: 10px; border: 1px solid #ccc; z-index: 9999; box-shadow: 0 0 10px rgba(0,0,0,0.1); color: white; font-family: Arial, sans-serif; width: 300px;">
-            <h3 style="margin: 0 0 10px;">${translations[language].delete}</h3>
+            <h3 style="margin: 0 0 10px;">Tweet Silme Paneli</h3>
             <input type="text" id="usernameInput" placeholder="Kullanıcı Adı" style="width: 100%; margin-bottom: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
             <input type="text" id="keywordInput" placeholder="Kelime" style="width: 100%; margin-bottom: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
-            <button id="searchButton" style="width: 100%; margin-bottom: 10px; padding: 5px; background: white; color: #1DA1F2; border: none; border-radius: 4px; cursor: pointer;">${translations[language].search}</button>
+            <button id="searchButton" style="width: 100%; margin-bottom: 10px; padding: 5px; background: white; color: #1DA1F2; border: none; border-radius: 4px; cursor: pointer;">Arama Yap</button>
             <div id="excludeSection" style="display: none;">
-                <input type="text" id="excludeInput" placeholder="${translations[language].excludePlaceholder}" style="width: 100%; margin-bottom: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
-                <button id="addExcludeButton" style="width: 100%; margin-bottom: 10px; padding: 5px; background: white; color: #1DA1F2; border: none; border-radius: 4px; cursor: pointer;">${translations[language].addExclude}</button>
+                <input type="text" id="excludeInput" placeholder="Hariç Tutulacak Tweet ID'leri (Nokta ile ayırın)" style="width: 100%; margin-bottom: 10px; padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
+                <button id="addExcludeButton" style="width: 100%; margin-bottom: 10px; padding: 5px; background: white; color: #1DA1F2; border: none; border-radius: 4px; cursor: pointer;">ID'leri Ekle</button>
                 <div id="excludeList" style="margin-bottom: 10px;"></div>
             </div>
-            <button id="deleteButton" style="width: 100%; margin-bottom: 10px; padding: 5px; background: white; color: #1DA1F2; border: none; border-radius: 4px; cursor: pointer; display: none;">${translations[language].delete}</button>
-            <button id="stopButton" style="width: 100%; margin-bottom: 10px; padding: 5px; background: red; color: white; border: none; border-radius: 4px; cursor: pointer; display: none;">${translations[language].stop}</button>
+            <button id="deleteButton" style="width: 100%; margin-bottom: 10px; padding: 5px; background: white; color: #1DA1F2; border: none; border-radius: 4px; cursor: pointer; display: none;">Tweetleri Sil</button>
+            <button id="stopButton" style="width: 100%; margin-bottom: 10px; padding: 5px; background: red; color: white; border: none; border-radius: 4px; cursor: pointer; display: none;">İşlemi Durdur</button>
             <div id="historySection" style="display: none;">
-                <h4 style="margin: 0 0 10px;">${translations[language].history}</h4>
+                <h4 style="margin: 0 0 10px;">İşlem Geçmişi</h4>
                 <div id="historyList" style="height: 100px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; background: white; color: black;"></div>
-                <button id="clearHistoryButton" style="width: 100%; margin-top: 10px; padding: 5px; background: white; color: #1DA1F2; border: none; border-radius: 4px; cursor: pointer;">${translations[language].clearHistory}</button>
+                <button id="clearHistoryButton" style="width: 100%; margin-top: 10px; padding: 5px; background: white; color: #1DA1F2; border: none; border-radius: 4px; cursor: pointer;">Geçmişi Temizle</button>
             </div>
             <div id="logOutput" style="height: 100px; overflow-y: auto; border: 1px solid #ccc; padding: 5px; font-family: monospace; font-size: 12px; background: white; color: black;"></div>
         </div>
@@ -85,7 +50,7 @@
     // Hariç tutulacak ID'leri saklamak için dizi
     let excludeIds = [];
 
-    // İşlem geçmişi (5)
+    // İşlem geçmişi
     let deletionHistory = [];
 
     // Arama butonu tıklama işlemi
@@ -125,7 +90,7 @@
     // Silme işlemini durdurma değişkeni
     let isStopped = false;
 
-    // Tweet silme fonksiyonu (2 - Otomatik Kaydırma)
+    // Tweet silme fonksiyonu (Otomatik Kaydırma)
     async function deleteTweets() {
         let totalDeleted = 0;
         let scrollAttempts = 0;
@@ -135,7 +100,7 @@
             try {
                 const tweets = document.querySelectorAll('[data-testid="tweet"]');
                 if (tweets.length === 0) {
-                    logToPanel(`⏭️ ${translations[language].noTweets} ${translations[language].scrollMore}`);
+                    logToPanel("⏭️ Silinecek tweet bulunamadı. Sayfa kaydırılıyor...");
                     window.scrollTo(0, document.body.scrollHeight);
                     await new Promise(resolve => setTimeout(resolve, 3000));
                     scrollAttempts++;
@@ -177,22 +142,22 @@
                     }
                 }
 
-                logToPanel(`⬇️ ${translations[language].scrollMore} Kaydırma denemesi: ${scrollAttempts + 1}`);
+                logToPanel(`⬇️ Sayfa kaydırılıyor... Kaydırma denemesi: ${scrollAttempts + 1}`);
                 window.scrollTo(0, document.body.scrollHeight);
                 await new Promise(resolve => setTimeout(resolve, 3000));
                 scrollAttempts++;
             } catch (error) {
-                // Hata yönetimi (8)
-                logToPanel(`❌ ${translations[language].errorOccurred} ${error.message}`);
+                // Hata yönetimi
+                logToPanel(`❌ Hata oluştu: ${error.message}`);
                 console.error(error);
                 break;
             }
         }
 
         if (isStopped) {
-            logToPanel(`🛑 ${translations[language].processStopped}`);
+            logToPanel("🛑 İşlem kullanıcı tarafından durduruldu.");
         } else {
-            logToPanel(`🏁 ${translations[language].processCompleted} Toplam silinen tweet sayısı: ${totalDeleted}`);
+            logToPanel(`🏁 İşlem tamamlandı. Toplam silinen tweet sayısı: ${totalDeleted}`);
         }
     }
 
@@ -209,7 +174,7 @@
         return null;
     }
 
-    // İşlem geçmişini güncelleme fonksiyonu (5)
+    // İşlem geçmişini güncelleme fonksiyonu
     function updateHistory() {
         const historyList = document.getElementById('historyList');
         historyList.innerHTML = deletionHistory.map(entry => `<div>ID: ${entry.id} - ${entry.timestamp}</div>`).join('');
@@ -226,7 +191,7 @@
         isStopped = true;
     });
 
-    // Geçmişi temizle butonu tıklama işlemi (5)
+    // Geçmişi temizle butonu tıklama işlemi
     document.getElementById('clearHistoryButton').addEventListener('click', () => {
         deletionHistory = [];
         updateHistory();
