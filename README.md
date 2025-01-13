@@ -25,10 +25,12 @@ Twitter'da belirli bir kullanıcı adı ve kelimeye göre tweet'leri otomatik ol
 
 ## 🖥️ Kullanım
 
-1. Twitter'da bir arama sayfası açın (örneğin, `from:kullanici_adi kelime`).
-2. Paneldeki **"Arama Yap"** butonunu kullanarak arama yapın.
-3. **"Tweetleri Sil"** butonuna tıklayarak silme işlemini başlatın.
-4. İşlemi durdurmak için **"İşlemi Durdur"** butonunu kullanabilirsiniz.
+1. Twitter anasayfasına gidin.
+2. Panelde kullanıcı adı kısmına kullanıcı adınızı yazın.
+3. Kelime kısmına anahat
+4. Paneldeki **"Arama Yap"** butonunu kullanarak arama yapın.
+5. **"Tweetleri Sil"** butonuna tıklayarak silme işlemini başlatın.
+6. İşlemi durdurmak için **"İşlemi Durdur"** butonunu kullanabilirsiniz.
 
 ---
 
@@ -36,7 +38,7 @@ Twitter'da belirli bir kullanıcı adı ve kelimeye göre tweet'leri otomatik ol
 
 | Panel Görünümü | Silme İşlemi |
 |----------------|--------------|
-| ![Panel](https://via.placeholder.com/400x200) | ![Silme](https://via.placeholder.com/400x200) |
+| ![Panel](https://raw.githubusercontent.com/odk-0160/Twitter-Gelismis-Tweet-Silme-Araci/refs/heads/main/images/sc1.png) | ![Silme](https://raw.githubusercontent.com/odk-0160/Twitter-Gelismis-Tweet-Silme-Araci/refs/heads/main/images/sc2.png) |
 
 ---
 
