@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter Tweet Silme Paneli (Gelişmiş Özellikler)
 // @namespace    http://tampermonkey.net/
-// @version      3.2
+// @version      1.0
 // @description  Twitter'da belirli bir kullanıcı adı ve kelimeye göre tweet'leri siler, gelişmiş filtreleme, otomatik kaydırma, işlem geçmişi ve hata yönetimi içerir.
 // @author       odk-0160
 // @match        *://twitter.com/*
