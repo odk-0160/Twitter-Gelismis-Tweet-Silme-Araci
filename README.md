@@ -1,4 +1,4 @@
-# 🚀 Twitter Tweet Silme Paneli (Gelişmiş Özellikler)
+# 🚀 Twitter Tweet Silme Paneli
 
 Twitter'da belirli bir kullanıcı adı ve kelimeye göre tweet'leri otomatik olarak silen, gelişmiş filtreleme, otomatik kaydırma, işlem geçmişi ve hata yönetimi özelliklerine sahip kullanıcı dostu bir araç.
 
